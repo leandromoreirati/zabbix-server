@@ -1,0 +1,36 @@
+FROM debian:latest
+LABEL maintainer Leandro Moreira <leandro@leandromoreirati.com.br>
+
+COPY configs/   /tmp/configs/
+
+RUN dpkg -i /tmp/configs/zabbix-release_3.4-1+stretch_all.deb && \
+    cat /usr/share/doc/apt/examples/sources.list > /etc/apt/sources.list && \
+    echo "deb http://ftp.de.debian.org/debian stretch main non-free" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --no-install-recommends zabbix-server-pgsql zabbix-get vim net-tools snmp snmp-mibs-downloader nmap nbtscan sudo && \
+    mv -v /tmp/configs/zabbix_server.conf /etc/zabbix/ && \
+    mv -v /tmp/configs/sudoers /etc/ && \
+    mv -v /tmp/configs/setup.sh /usr/bin/ && \
+    rm /etc/localtime && \
+    ln -s /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+    rm -rfv /tmp/* && \
+    apt-get autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/postgresql/* && \
+    mkdir -p /var/run/zabbix && chown zabbix.zabbix -R /var/run/zabbix
+
+VOLUME /etc/zabbix
+
+VOLUME /usr/lib/zabbix/alertscripts
+
+VOLUME /usr/lib/zabbix/externalscripts
+
+WORKDIR /var/lib/zabbix
+
+EXPOSE 10051/TCP
+
+#USER zabbix
+
+#ENTRYPOINT [ "setup.sh" ]

@@ -1,0 +1,78 @@
+version: "3.6"
+services:
+
+# ZABBIX SERVER
+  zabbix-server-pgsql:
+    image: leandromoreirajfa/zabbix-server-pgsql:1.1
+    command: setup.sh
+    env_file:
+      - zabbix-server.config
+    hostname: zabbix-server-pgsql
+    ports:
+      - "10051:10051"
+    privileged: true
+    stdin_open: true
+    #tty: true
+    ulimits:
+     nproc: 65535
+     nofile:
+      soft: 20000
+      hard: 40000
+    #depends_on:
+    # - zabbix-pgsql
+    deploy:
+      #placement:
+       # constraints: [node.role == manager]
+      resources:
+        limits:
+          memory: 1024M
+          cpus: '0.70'
+        reservations:
+          cpus: '0.5'
+          memory: 512M   
+    restart: always
+    volumes:
+      - zabbix-externalscript:/usr/lib/zabbix/alertscripts
+      - zabbix-alertscript:/usr/lib/zabbix/externalscripts
+      - zabbix-etc:/etc/zabbix
+      - zabbix-snmp:/usr/share/snmp/mibs
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
+    depends_on:
+      - zabbix-pgsql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "250m"
+        max-file: "3"
+    networks:
+      - frontend
+      - backend
+      
+# VOLUME GRAFANA
+volumes:
+  zabbix-alertscript:
+  zabbix-externalscript:
+  zabbix-etc:
+  zabbix-snmp:
+  
+# REDE
+networks:
+  backend:
+    driver: overlay   
+    ipam:
+      driver: default    
+      config:
+      - subnet: 172.30.0.0/24
+  frontend:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.31.0.0/24
