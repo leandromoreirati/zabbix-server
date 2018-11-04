@@ -2,22 +2,15 @@ version: "3.6"
 services:
 
 # ZABBIX SERVER
-  zabbix-server-pgsql:
+  zabbix-server:
     image: leandromoreirajfa/zabbix-server-pgsql:1.1
     command: setup.sh
     env_file:
-      - zabbix-server.config
-    hostname: zabbix-server-pgsql
+      - server.config
+    hostname: zabbix-server
     ports:
       - "10051:10051"
-    privileged: true
     stdin_open: true
-    #tty: true
-    ulimits:
-     nproc: 65535
-     nofile:
-      soft: 20000
-      hard: 40000
     #depends_on:
     # - zabbix-pgsql
     deploy:
