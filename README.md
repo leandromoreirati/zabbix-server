@@ -21,7 +21,7 @@ Os pre-requisitos necessários para execução da stack de serviço:
  <IP_DO_SERVIDOR> deve ser substituído pelo ip do seu servidor.
 
 # BAIXANDO AS IMAGENS
- docker pull leandromoreirajfa/zabbix-server:1.2\
+ docker pull leandromoreirajfa/zabbix-server:1.2
                                                  
 # SERVIÇO ZABBIX SERVER
 Para configurar o serviço do Zabbix Server, editar o arquivo server.config que localiza-se no diretório configs, alterando as variáveis:
